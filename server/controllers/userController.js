@@ -7,13 +7,13 @@ export const register = async (req, res) => {
         const { name, email, password } = req.body;
 
         if (!name || !email || !password) {
-            return res.json({ success: false, message: "Missing Details" });
+            return res.status(400).json({ success: false, message: "Missing Details" });
         }
 
         const existingUser = await User.findOne({ email });
 
         if (existingUser) {
-            return res.json({ success: false, message: "User Already Exists" });
+            return res.status(409).json({ success: false, message: "User Already Exists" });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -37,7 +37,7 @@ export const register = async (req, res) => {
             maxAge: 7 * 24 * 60 * 60 * 1000
         });
 
-        return res.json({
+        return res.status(201).json({
             success: true,
             user: {
                 email: user.email,
@@ -47,7 +47,7 @@ export const register = async (req, res) => {
 
     } catch (error) {
         console.log(error.message);
-        res.json({ success: false, message: error.message });
+        res.status(500).json({ success: false, message: error.message });
     }
 }
 
@@ -59,7 +59,7 @@ export const login = async (req, res) => {
 
 
         if (!email || !password) {
-            return res.json({
+            return res.status(400).json({
                 success: false,
                 message: "Email and password are required"
             });
@@ -69,7 +69,7 @@ export const login = async (req, res) => {
         const user = await User.findOne({ email });
 
         if (!user) {
-            return res.json({
+            return res.status(401).json({
                 success: false,
                 message: "Invalid Credentials"
             });
@@ -79,7 +79,7 @@ export const login = async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
 
         if (!isMatch) {
-            return res.json({
+            return res.status(401).json({
                 success: false,
                 message: "Invalid Credentials"
             });
@@ -110,7 +110,7 @@ export const login = async (req, res) => {
 
     } catch (error) {
         console.log(error.message);
-        res.json({ success: false, message: error.message });
+        res.status(500).json({ success: false, message: error.message });
     }
 };
 
