@@ -19,7 +19,7 @@ export const sellerLogin = async(req,res)=>{
             message:"Logged In"
         })
     }else{
-        return res.json({
+        return res.status(401).json({
             success:false,
             message:"Invalid Credentials"
         })  
@@ -27,7 +27,7 @@ export const sellerLogin = async(req,res)=>{
 
     }catch(error){
         console.log(error.message)
-        res.json({success:false, message:error.message})
+        res.status(500).json({success:false, message:error.message})
 
     }
 }
@@ -43,7 +43,7 @@ export const isSellerAuth = async (req, res) => {
         });
     } catch (error) {
         console.log(error.message);
-        return res.json({
+        return res.status(500).json({
             success: false,
             message: error.message
         });
@@ -69,6 +69,6 @@ export const sellerLogout=async(req,res)=>{
 
     }catch(error){
         console.log(error.message);
-        res.json({ success: false, message: error.message });
+        res.status(500).json({ success: false, message: error.message });
     }
 }
