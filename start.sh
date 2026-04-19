@@ -82,14 +82,6 @@ start_frontend() {
   log "Frontend running (PID: $FRONTEND_PID)"
 }
 
-# Docker mode
-if [[ "$1" == "--docker" ]]; then
-  log "Starting with Docker Compose..."
-  command -v docker &>/dev/null || die "Docker is not installed."
-  docker compose up --build
-  exit 0
-fi
-
 # Run services
 start_backend
 start_frontend

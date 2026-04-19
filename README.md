@@ -1,122 +1,58 @@
 # BlueMart 🛒
 
-> A premium full-stack grocery and snack delivery application with a complete DevOps pipeline.
+> A premium full-stack grocery and snack delivery application with a focus on Clean Architecture, Type Safety, and Scalable Design.
 
-**Built by Rahul Dhakad** | [Live Demo](https://blue-mart-drab.vercel.app)
+**Built by Rahul Dhakad** | [Live Demo]https://sesd-project-724p.vercel.app/
 
 ---
 
-## 🏗️ Architecture
+## 🏗️ Architecture (Clean & Scalable)
 
-BlueMart follows a **monorepo, 3-tier architecture** with complete separation of concerns:
+BlueMart follows a **monorepo, 5-tier Clean Architecture** with strict separation of concerns:
 
 ```
 BlueMart/
-├── client/          # React + Vite Frontend (SPA)
-├── server/          # Node.js + Express REST API
-├── api/             # Vercel Serverless Entry Point
-├── .github/
-│   ├── workflows/   # GitHub Actions CI/CD Pipeline
-│   └── dependabot.yml
-└── start.sh         # Idempotent startup script
+├── client/          # React + Vite + TypeScript (Frontend SPA)
+├── server/          # Node.js + Express + TypeScript (REST API)
+│   ├── controllers/ # Thin Request Handlers
+│   ├── services/    # Business Logic Tier (Singletons)
+│   ├── repositories/# Data Access Tier (Generic Patterns)
+│   └── models/      # Mongoose Schemas & Interfaces
+├── api/             # Vercel Serverless Entry Point (TypeScript)
+└── ...
 ```
 
-```mermaid
-graph TD
-    U[👤 User Browser] --> FE[React Frontend\nVercel CDN]
-    FE -->|/api/* requests| SF[Vercel Serverless\napi/index.js]
-    SF --> EX[Express App\nserver/app.js]
-    EX --> MW[Middleware Layer\nAuth + CORS + Cookie]
-    MW --> RT[Route Handlers\nUser / Product / Order]
-    RT --> DB[(MongoDB Atlas)]
-    RT --> CL[Cloudinary\nImage Storage]
-    RT --> ST[Stripe\nPayments]
-```
-
-### Layer Breakdown
-
-| Layer | Technology | Responsibility |
-|---|---|---|
-| **Frontend** | React 19, Vite, TailwindCSS v4 | UI rendering, state management, API calls |
-| **API Gateway** | Vercel Serverless (`api/index.js`) | Routes `/api/*` to Express in production |
-| **Backend** | Express 5, Node.js 22 | REST API, business logic, auth middleware |
-| **Database** | MongoDB Atlas + Mongoose | Data persistence, schema validation |
-| **Auth** | JWT + HttpOnly Cookies | Stateless, secure session management |
-| **Media** | Cloudinary | Product image upload and CDN delivery |
-| **Payments** | Stripe | Secure online payment processing |
+### Modern Tech Stack
+- **Frontend**: React 19, Vite, TypeScript, TailwindCSS v4
+- **Backend**: Node.js 22, Express 5, TypeScript
+- **Database**: MongoDB Atlas + Mongoose
+- **Architecture**: Controller-Service-Repository (Clean Architecture)
+- **Design Patterns**: Singleton (Services), Repository Pattern, Factory-like instantiation
+- **Auth**: JWT + HttpOnly Cookies (XSS-proof)
+- **Payments**: Stripe Integration (Online & COD)
+- **Media**: Cloudinary CDN for optimized image delivery
 
 ---
 
-## ⚙️ CI/CD Workflow
+## 📐 UML Documentation
 
-Every `git push` to `main` or Pull Request triggers the automated pipeline:
-
-```mermaid
-graph LR
-    A[👨‍💻 git push / PR] --> B(GitHub Actions)
-    
-    subgraph CI ["CI Pipeline (Parallel)"]
-        B --> C[🖥️ Build Client]
-        B --> D[🔧 Build Server]
-        C --> C1[npm ci]
-        C1 --> C2[ESLint]
-        C2 --> C3[Vitest Tests]
-        C3 --> C4[Vite Build]
-        D --> D1[npm ci]
-        D1 --> D2[ESLint]
-        D2 --> D3[Jest Integration Tests]
-    end
-
-    subgraph CD ["CD Pipeline (on main only)"]
-        C4 --> E[✅ Vercel Auto-Deploy]
-        D3 --> F[🚀 EC2 SSH Deploy]
-        F --> G[bash start.sh --docker]
-    end
-
-    style C3 fill:#e8f5e9,stroke:#4caf50
-    style D3 fill:#e8f5e9,stroke:#4caf50
-```
+Required project documentation is available in the root directory:
+- [idea.md](./idea.md) → Project scope and key features.
+- [useCaseDiagram.md](./useCaseDiagram.md) → Mermaid UML for Actor interactions.
+- [sequenceDiagram.md](./sequenceDiagram.md) → Mermaid UML for the end-to-end checkout flow.
+- [classDiagram.md](./classDiagram.md) → Mermaid UML showing architectural layer relationships.
+- [ErDiagram.md](./ErDiagram.md) → Mermaid UML for the Entity-Relationship data model.
 
 ---
 
 ## 🧪 Testing Strategy
 
-### Unit Tests (`Vitest` — Frontend)
-Located in `client/src/**/*.test.jsx`:
-
-| Test File | What it Tests |
-|---|---|
-| `MainBanner.test.jsx` | Hero section heading and CTA buttons render |
-| `ProductCard.test.jsx` | Product name, price, ADD button, category badge |
-| `Categories.test.jsx` | All category items render, VIEW ALL button present |
-| `AppContext.test.js` | `getCartCount()` and `getCartAmount()` logic |
-
 ### Integration Tests (`Jest` — Backend)
-Located in `server/tests/`:
-
-| Test File | What it Tests |
-|---|---|
-| `api.integration.test.js` | Health check, product listing, user registration, auth guard |
-
-Integration tests use **`mongodb-memory-server`** — a real in-memory MongoDB instance that requires no external connection. This ensures tests are **isolated, repeatable, and run anywhere**.
-
-Run all tests:
+Located in `server/tests/`. Run all tests:
 ```bash
-# Frontend
-cd client && npm run test
-
-# Backend
 cd server && npm test
 ```
-
----
-
-## 🔐 Security Design
-
-- **JWT** tokens stored in **HttpOnly cookies** (not localStorage) — XSS proof
-- **CORS** restricted to allow-listed origins in production
-- **Seller access** restricted by email — only authorized sellers can list products
-- **bcryptjs** password hashing with salt rounds
+Integration tests use **`mongodb-memory-server`** (an in-memory MongoDB instance) and **TypeScript ESM** for isolated and reliable testing.
 
 ---
 
@@ -124,74 +60,44 @@ cd server && npm test
 
 ### Local Development
 
+1. **Install Dependencies**:
 ```bash
-# Option 1: Auto-start everything (idempotent)
+# Root
 bash start.sh
-
-# Option 2: Manual
-cd server && npm start
-cd client && npm run dev
-
-# Option 3: Docker
-bash start.sh --docker
 ```
 
-### Environment Variables
+2. **Configure Environment**:
+Create `server/.env` based on the placeholders provided in the file (requires MongoDB, Cloudinary, and Stripe keys).
 
-Create `server/.env`:
-```env
-MONGODB_URI=your_mongodb_uri
-JWT_SECRET=your_jwt_secret
-SELLER_EMAIL=your_seller_email
-SELLER_PASSWORD=your_seller_password
-CLOUDINARY_CLOUD_NAME=your_cloudinary_name
-CLOUDINARY_API_KEY=your_cloudinary_key
-CLOUDINARY_API_SECRET=your_cloudinary_secret
-```
-
----
-
-## 📦 Idempotent Deployment Script
-
-`start.sh` is designed to be **run multiple times safely**:
-
+3. **Run Application**:
 ```bash
-# ✅ Good: Only installs if node_modules is missing
-install_if_needed() {
-  if [ ! -d "node_modules" ]; then npm ci; fi
-}
+# Backend (Server)
+cd server && npm start
 
-# ✅ Good: Kills old process on port before starting (no port conflicts)
-lsof -ti:4000 | xargs kill -9 2>/dev/null || true
+# Frontend (Client)
+cd client && npm run dev
 ```
 
 ---
 
-## 🤝 Dependabot
+## 🧩 Key Design Decisions
 
-Automated weekly dependency updates for:
-- `/client` — Frontend npm packages (labeled `frontend`)
-- `/server` — Backend npm packages (labeled `backend`)
-- `github-actions` — Monthly updates for workflow actions
+### ① Clean Architecture
+To ensure high maintainability (SESD criteria), logic is extracted from controllers into **Services** (Business Logic) and **Repositories** (Data Access).
+
+### ② Full-Stack TypeScript
+Migrated the entire codebase from JavaScript to TypeScript to ensure compile-time type safety and professional-grade code quality.
+
+### ③ Automated Deployment (Vercel)
+Configured `vercel.json` and `api/index.ts` to bridge the Express backend into a serverless environment with native TypeScript support.
 
 ---
 
-## 🧩 Design Decisions & Challenges
+## 👨‍💻 Author
 
-### ① Monorepo on Vercel
-**Challenge:** Vercel expects either a pure frontend or backend project, not a monorepo with both.  
-**Decision:** Created `api/index.js` as a Vercel serverless bridge that imports the Express app. Added a root `vercel.json` to route `/api/*` to the serverless function and everything else to the React build.
-
-### ② Database Connections in Serverless
-**Challenge:** Serverless functions spin up fresh for each request — calling `mongoose.connect()` every time would exhaust connection pools.  
-**Decision:** Added a `readyState >= 1` guard in `connectDB()` so the connection is reused across warm invocations.
-
-### ③ JWT in Cookies vs. localStorage
-**Decision:** HttpOnly cookies are used for storing JWTs to prevent XSS attacks. This also means the frontend doesn't need to manually attach tokens — the browser handles it automatically.
-
-### ④ Image Storage
-**Challenge:** Storing images as base64 in MongoDB caused performance issues and exceeded document size limits.  
-**Decision:** Migrated all uploads to Cloudinary. Images are served via Cloudinary's CDN for fast, global delivery.
+**Rahul Dhakad**  
+Full-Stack Developer | React · Node.js · MongoDB · TypeScript
+y's CDN for fast, global delivery.
 
 ---
 
