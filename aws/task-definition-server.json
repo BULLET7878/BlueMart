@@ -6,7 +6,7 @@
   ],
   "cpu": "256",
   "memory": "512",
-  "executionRoleArn": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/ecsTaskExecutionRole",
+  "executionRoleArn": "arn:aws:iam::637423597912:role/ecsTaskExecutionRole",
   "containerDefinitions": [
     {
       "name": "server",

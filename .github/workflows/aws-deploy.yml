@@ -6,11 +6,11 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  ECR_REPOSITORY_SERVER: bluemart-server
-  ECR_REPOSITORY_CLIENT: bluemart-client
-  ECS_CLUSTER: bluemart-cluster
-  ECS_SERVICE_SERVER: bluemart-server-service
-  ECS_SERVICE_CLIENT: bluemart-client-service
+  ECR_REPOSITORY_SERVER: shopsmart
+  ECR_REPOSITORY_CLIENT: shopsmart-client
+  ECS_CLUSTER: shopsmart-cluster
+  ECS_SERVICE_SERVER: shopsmart-service
+  ECS_SERVICE_CLIENT: shopsmart-client-service
   ECS_TASK_DEFINITION_SERVER: ./aws/task-definition-server.json
   ECS_TASK_DEFINITION_CLIENT: ./aws/task-definition-client.json
 
