@@ -33,8 +33,10 @@ export const AppContextProvider = ({ children }) => {
         setIsSeller(false);
       }
     } catch (error) {
-      const errorMessage = error.response?.data?.message || error.message;
-      toast.error("Failed to fetch seller data: " + errorMessage);
+      if (error.response?.status !== 401) {
+        const errorMessage = error.response?.data?.message || error.message;
+        toast.error("Failed to fetch seller data: " + errorMessage);
+      }
       setIsSeller(false);
     }
   };
