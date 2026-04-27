@@ -2,6 +2,7 @@
   "name": "bluemart-root",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "dependencies": {
     "express": "^5.2.1",
     "mongoose": "^9.1.6",

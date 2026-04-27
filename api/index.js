@@ -3,6 +3,7 @@ dotenv.config();
 
 import app from "../server/app.js";
 import connectDB from "../server/configs/db.js";
+import connectCloudinary from "../server/configs/cloudinary.js";
 
 export default async (req, res) => {
     try {
@@ -10,6 +11,7 @@ export default async (req, res) => {
             throw new Error("MONGODB_URI is missing from Vercel Environment Variables. Please add it in the Vercel Dashboard.");
         }
         await connectDB();
+        await connectCloudinary();
         return app(req, res);
     } catch (error) {
         console.error("Vercel Backend Error:", error);
