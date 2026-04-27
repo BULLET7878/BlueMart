@@ -7,6 +7,11 @@ export default defineConfig({
   plugins: [react(),
   tailwindcss()
   ],
+  server: {
+    proxy: {
+      '/api': 'http://localhost:4000'
+    }
+  },
   test: {
     globals: true,
     environment: 'jsdom',
