@@ -33,7 +33,8 @@ export const AppContextProvider = ({ children }) => {
         setIsSeller(false);
       }
     } catch (error) {
-      toast.error("Failed to fetch seller data: ", error);
+      const errorMessage = error.response?.data?.message || error.message;
+      toast.error("Failed to fetch seller data: " + errorMessage);
       setIsSeller(false);
     }
   };
@@ -46,7 +47,10 @@ export const AppContextProvider = ({ children }) => {
         setCartItems(data.user?.cartItems);
       }
     } catch (error) {
-      toast.error("Failed to fetch user data: ", error);
+      // Don't show toast for 401 on initialization as it's expected for guests
+      if (error.response?.status !== 401) {
+        toast.error("Failed to fetch user data: " + (error.response?.data?.message || error.message));
+      }
       setUser(null);
     }
   };
@@ -61,7 +65,7 @@ export const AppContextProvider = ({ children }) => {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.response?.data?.message || error.message);
     }
   };
 
@@ -146,7 +150,7 @@ export const AppContextProvider = ({ children }) => {
             toast.error(data.message);
           }
         } catch (error) {
-          toast.error(error.message);
+          toast.error(error.response?.data?.message || error.message);
         }
       })();
     } else {

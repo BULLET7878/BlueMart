@@ -16,7 +16,6 @@ const Navbar = () => {
     searchQuery,
     getCartCount,
     axios,
-    isSeller,
     setShowSellerLogin,
   } = useAppContext();
 

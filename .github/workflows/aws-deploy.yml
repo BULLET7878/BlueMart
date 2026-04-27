@@ -1,0 +1,96 @@
+name: Deploy to Amazon ECS
+
+on:
+  push:
+    branches: [ "main" ]
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY_SERVER: bluemart-server
+  ECR_REPOSITORY_CLIENT: bluemart-client
+  ECS_CLUSTER: bluemart-cluster
+  ECS_SERVICE_SERVER: bluemart-server-service
+  ECS_SERVICE_CLIENT: bluemart-client-service
+  ECS_TASK_DEFINITION_SERVER: ./aws/task-definition-server.json
+  ECS_TASK_DEFINITION_CLIENT: ./aws/task-definition-client.json
+
+jobs:
+  deploy:
+    name: Build and Deploy to ECS
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    # --- Build and Deploy Server ---
+    - name: Build, tag, and push SERVER image to Amazon ECR
+      id: build-server-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        # Build a docker container and push it to ECR
+        cd server
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_SERVER:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY_SERVER:$IMAGE_TAG
+        echo "server_image=$ECR_REGISTRY/$ECR_REPOSITORY_SERVER:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+    - name: Fill in the new SERVER image ID in the Amazon ECS task definition
+      id: task-def-server
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: ${{ env.ECS_TASK_DEFINITION_SERVER }}
+        container-name: server
+        image: ${{ steps.build-server-image.outputs.server_image }}
+
+    - name: Deploy SERVER Amazon ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.task-def-server.outputs.task-definition }}
+        service: ${{ env.ECS_SERVICE_SERVER }}
+        cluster: ${{ env.ECS_CLUSTER }}
+        wait-for-service-stability: true
+
+    # --- Build and Deploy Client ---
+    - name: Build, tag, and push CLIENT image to Amazon ECR
+      id: build-client-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        # Build a docker container and push it to ECR
+        cd client
+        # Passing build arguments securely
+        docker build --build-arg VITE_BACKEND_URL=${{ secrets.VITE_BACKEND_URL }} \
+                     --build-arg VITE_CURRENCY=${{ secrets.VITE_CURRENCY }} \
+                     -t $ECR_REGISTRY/$ECR_REPOSITORY_CLIENT:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY_CLIENT:$IMAGE_TAG
+        echo "client_image=$ECR_REGISTRY/$ECR_REPOSITORY_CLIENT:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+    - name: Fill in the new CLIENT image ID in the Amazon ECS task definition
+      id: task-def-client
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: ${{ env.ECS_TASK_DEFINITION_CLIENT }}
+        container-name: client
+        image: ${{ steps.build-client-image.outputs.client_image }}
+
+    - name: Deploy CLIENT Amazon ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.task-def-client.outputs.task-definition }}
+        service: ${{ env.ECS_SERVICE_CLIENT }}
+        cluster: ${{ env.ECS_CLUSTER }}
+        wait-for-service-stability: true

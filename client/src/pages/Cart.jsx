@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
-import { assets } from "../assets/assets";
 import toast from "react-hot-toast";
 
 const Cart = () => {
@@ -9,6 +8,7 @@ const Cart = () => {
     products,
     currency,
     cartItems,
+    addToCart,
     removeFromCart,
     getCartCount,
     updateCartItem,

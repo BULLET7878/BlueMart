@@ -22,7 +22,7 @@ import Loading from "./components/Loading.jsx";
 
 const App = () => {
   const isSellerPath = useLocation().pathname.includes("seller");
-  const { showUserLogin, showSellerLogin, isSeller, user } = useAppContext();
+  const { showUserLogin, showSellerLogin, isSeller } = useAppContext();
 
   return (
     <div className="text-default min-h-screen text-gray-700 bg-white">

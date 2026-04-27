@@ -8,7 +8,7 @@ export const addAddress = async (req, res) => {
     res.json({ success: true, message: "Address Added Successfully" })
 
   } catch (error) {
-    res.json({ success: false, message: error.message })
+    res.status(500).json({ success: false, message: error.message })
   }
 }
 
@@ -20,6 +20,6 @@ export const getAddress = async (req, res) => {
 
     res.json({ success: true, addresses });
   } catch (error) {
-    res.json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 }

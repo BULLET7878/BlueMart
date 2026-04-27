@@ -12,7 +12,7 @@ const MyOrders = () => {
       if (data.success) {
         setMyOrders(data.orders);
       }
-    } catch (error) { }
+    } catch { /* silently handle fetch errors */ }
   };
 
   useEffect(() => {

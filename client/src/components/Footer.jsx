@@ -1,5 +1,4 @@
 import { footerLinks } from "../assets/assets";
-import { assets } from "../assets/assets";
 
 const Footer = () => {
     
