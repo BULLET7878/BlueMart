@@ -2,7 +2,7 @@
   "family": "bluemart-server",
   "networkMode": "awsvpc",
   "requiresCompatibilities": [
-    "FARGATE"
+    "EC2"
   ],
   "cpu": "256",
   "memory": "512",
