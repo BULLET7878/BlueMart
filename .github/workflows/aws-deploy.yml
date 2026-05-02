@@ -56,7 +56,7 @@ jobs:
         image: ${{ steps.build-server-image.outputs.server_image }}
 
     - name: Deploy SERVER Amazon ECS task definition
-      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v2
       with:
         task-definition: ${{ steps.task-def-server.outputs.task-definition }}
         service: ${{ env.ECS_SERVICE_SERVER }}
@@ -88,7 +88,7 @@ jobs:
         image: ${{ steps.build-client-image.outputs.client_image }}
 
     - name: Deploy CLIENT Amazon ECS task definition
-      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v2
       with:
         task-definition: ${{ steps.task-def-client.outputs.task-definition }}
         service: ${{ env.ECS_SERVICE_CLIENT }}
